@@ -1,80 +1,51 @@
 #include<bits/stdc++.h>
 
 using namespace std;
+ 
+int caso = 0;
+int rangoAnillo;
+int totalCadena[20];
+bool esUsado[20];
 
-vector <int> numerosPrimos = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
-int casos = 0;
-
-void imprimirVector(vector <int> &res) {
-
-    for (int i = 0; i < res.size(); ++i) {
-        cout << res[i];
-        if (res.size() != i+1) cout << ' ';
-    }
-
-}
-
-bool esPrimo(int &num) {
-
-    for (int i = 0; i < numerosPrimos.size(); ++i) {
-        if (num < numerosPrimos[i]) {
-            return false;
-        }
-        if (num == numerosPrimos[i]) {
-            return true;
-        }
-    }
-    return false;
-
-}
-
-bool anilloPrimo(vector <int> &posibleCadena) {
-
-    int evaluar = posibleCadena[0] + posibleCadena[posibleCadena.size() - 1];
-    if (!esPrimo(evaluar)) {
-        return false;
-    }
-    for (int i = 0; i < (posibleCadena.size()) - 1; ++i) {
-        int evaluar = posibleCadena[i] + posibleCadena[i+1];
-        if (!esPrimo(evaluar)) {
+bool esPrimo(int numero) {
+    for(int i = 2; i <= sqrt(numero); i++) {
+        if(numero % i == 0) {
             return false;
         }
     }
     return true;
-
 }
-
-void generarCombinaciones(vector <int> &valores) {
-
-    do {
-        if (valores[0] != 1) break;
-        if (anilloPrimo(valores)) {
-            imprimirVector(valores);
+ 
+void buscarCombinacion(int posicionEstable) {
+    if(posicionEstable == rangoAnillo - 1 && esPrimo(totalCadena[rangoAnillo - 1] + totalCadena[rangoAnillo])) {
+        for(int i = 0; i < rangoAnillo; i++) {
+            //printf(i == rangoAnillo - 1? "%d" : "%d ", totalCadena[i]);
+            cout << totalCadena[i];
+            if (i != rangoAnillo - 1) {
+                cout << ' ';
+            }
+        }
+        cout << endl;
+        return;
+    }
+    for(int i = 2; i <= rangoAnillo; i++) {
+        if(!esUsado[i] && esPrimo(totalCadena[posicionEstable] + i)) {
+            esUsado[i] = true;
+            totalCadena[posicionEstable + 1] = i;
+            buscarCombinacion(posicionEstable + 1);
+            esUsado[i] = false;
+        }
+    }
+}
+ 
+int main() {
+    while(scanf("%d", &rangoAnillo) == 1) {
+        caso++;
+        if(caso > 1) {
             cout << endl;
         }
-    } while (std::next_permutation(valores.begin(), valores.end()));
-
-}
-
-void crearAnillo(int &size) {
-
-    vector <int> valores;
-    for (int i = 1; i <=size; ++i) {
-        valores.push_back(i);
+        totalCadena[0] = totalCadena[rangoAnillo] = 1;
+        cout << "Case " << caso << ":" << endl;
+        buscarCombinacion(0);
     }
-    generarCombinaciones(valores);
-
-}
-
-int main() {
-    
-    int numero;
-    while(scanf("%d", &numero) == 1) {
-        cout << "Case " << ++casos << ':' << endl;
-        crearAnillo(numero);
-        cout << endl;
-    }
-
-    return 0;
-
 }
